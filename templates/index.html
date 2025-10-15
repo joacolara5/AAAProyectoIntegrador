@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Vehículos Eléctricos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header con efecto de gradiente -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="logo-container">
+                <i class="fas fa-charging-station logo-icon"></i>
+                <div class="title-container">
+                    <h1>Dashboard de Ventas de Vehículos Eléctricos</h1>
+                    <p class="subtitle">Análisis interactivo por tipo, región y tendencia temporal</p>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="stat-card">
+                    <span class="stat-value" id="total-vehicles">0</span>
+                    <span class="stat-label">Vehículos Totales</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="total-regions">0</span>
+                    <span class="stat-label">Regiones</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-value" id="total-years">0</span>
+                    <span class="stat-label">Años</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Panel de filtros mejorado -->
+    <section id="filters" class="filters-panel">
+        <div class="filter-group">
+            <label for="yearFilter" class="filter-label">
+                <i class="fas fa-calendar-alt"></i> Año:
+            </label>
+            <select id="yearFilter" class="filter-select">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="regionFilter" class="filter-label">
+                <i class="fas fa-globe-americas"></i> Región:
+            </label>
+            <select id="regionFilter" class="filter-select">
+                <option value="">Todas</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="vehicleTypeFilter" class="filter-label">
+                <i class="fas fa-car"></i> Tipo de Vehículo:
+            </label>
+            <select id="vehicleTypeFilter" class="filter-select">
+                <option value="">Todos</option>
+            </select>
+        </div>
+        
+        <button id="resetFilters" class="reset-btn">
+            <i class="fas fa-redo"></i> Restablecer Filtros
+        </button>
+    </section>
+
+    <!-- Navegación con pestañas mejoradas -->
+    <nav class="tabs-container">
+        <div class="tabs">
+            <button class="tab-button active" data-target="chart1">
+                <i class="fas fa-chart-pie"></i> Por Tipo de Vehículo
+            </button>
+            <button class="tab-button" data-target="chart2">
+                <i class="fas fa-map-marked-alt"></i> Por Región
+            </button>
+            <button class="tab-button" data-target="chart3">
+                <i class="fas fa-chart-line"></i> Tendencia Anual
+            </button>
+            <button class="tab-button" data-target="chart4">
+                <i class="fas fa-bolt"></i> Comparación de Rendimiento
+            </button>
+        </div>
+    </nav>
+
+    <!-- Sección de gráficos con mejor estructura -->
+    <section id="charts" class="charts-section">
+        <div id="chart1" class="chart visible">
+            <div class="chart-header">
+                <h2>Distribución por Tipo de Vehículo</h2>
+                <div class="chart-actions">
+                    <button class="chart-action-btn" data-chart="chart1" data-type="bar">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="chart-action-btn active" data-chart="chart1" data-type="pie">
+                        <i class="fas fa-chart-pie"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content" id="chart1-content"></div>
+        </div>
+        
+        <div id="chart2" class="chart">
+            <div class="chart-header">
+                <h2>Ventas por Región</h2>
+                <div class="chart-actions">
+                    <button class="chart-action-btn active" data-chart="chart2" data-type="bar">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="chart-action-btn" data-chart="chart2" data-type="map">
+                        <i class="fas fa-map"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content" id="chart2-content"></div>
+        </div>
+        
+        <div id="chart3" class="chart">
+            <div class="chart-header">
+                <h2>Tendencia de Ventas Anuales</h2>
+                <div class="chart-actions">
+                    <button class="chart-action-btn active" data-chart="chart3" data-type="line">
+                        <i class="fas fa-chart-line"></i>
+                    </button>
+                    <button class="chart-action-btn" data-chart="chart3" data-type="area">
+                        <i class="fas fa-chart-area"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content" id="chart3-content"></div>
+        </div>
+        
+        <div id="chart4" class="chart">
+            <div class="chart-header">
+                <h2>Comparación de Rendimiento</h2>
+                <div class="chart-actions">
+                    <button class="chart-action-btn active" data-chart="chart4" data-type="scatter">
+                        <i class="fas fa-chart-scatter"></i>
+                    </button>
+                    <button class="chart-action-btn" data-chart="chart4" data-type="bubble">
+                        <i class="fas fa-circle"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="chart-content" id="chart4-content"></div>
+        </div>
+    </section>
+
+    <!-- Información adicional -->
+    <section class="info-section">
+        <div class="info-card">
+            <h3><i class="fas fa-info-circle"></i> Acerca de los Datos</h3>
+            <p>Este dashboard muestra datos de ventas de vehículos eléctricos en diferentes regiones y años. Utiliza filtros interactivos para explorar tendencias y patrones específicos.</p>
+        </div>
+        
+        <div class="info-card">
+            <h3><i class="fas fa-lightbulb"></i> Tendencias Clave</h3>
+            <p id="key-insights">Cargando análisis de datos...</p>
+        </div>
+        
+        <div class="info-card">
+            <h3><i class="fas fa-download"></i> Exportar Datos</h3>
+            <div class="export-actions">
+                <button id="exportCSV" class="export-btn">
+                    <i class="fas fa-file-csv"></i> CSV
+                </button>
+                <button id="exportPNG" class="export-btn">
+                    <i class="fas fa-file-image"></i> PNG
+                </button>
+                <button id="exportPDF" class="export-btn">
+                    <i class="fas fa-file-pdf"></i> PDF
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer mejorado -->
+    <footer class="dashboard-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i class="fas fa-leaf"></i>
+                <span>proyecto integrador</span>
+            </div>
+            <p>Lara Joaquin, Aneyba Renata y Vargas Gabriel</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>
